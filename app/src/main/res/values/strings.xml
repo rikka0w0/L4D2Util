@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">L4D2Util</string>
+    <string name="action_add_server">Add Server</string>
+    <string name="message_add_server">Please enter server address and port: e.g. sample.com:port. Default port is 27015 if port is omitted.</string>
+    <string name="action_delete_server">Remove</string>
+    <string name="action_refresh_server">Refresh</string>
+    <string name="toast_refreshing">Refreshing</string>
+    <string name="subtext_unable_to_contact_server">Unable to contact server</string>
+    <string name="subtext_querying">Querying...</string>
+</resources>

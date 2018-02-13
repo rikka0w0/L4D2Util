@@ -3,10 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="rikka.l4d2util.MainActivity">
     <item
-        android:id="@+id/action_settings"
-        android:onClick="onAddServerClick"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:onClick="onShowAboutClick"
         android:orderInCategory="100"
-        android:title="@string/action_add_server"
-        android:icon="@android:drawable/ic_input_add"
+        android:title="@string/action_about"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@android:drawable/ic_menu_add"
+        android:onClick="onAddServerClick"
+        android:orderInCategory="101"
+        android:title="@string/action_add_server"
+        app:showAsAction="always" />
+
 </menu>

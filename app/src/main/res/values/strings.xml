@@ -12,4 +12,11 @@
     <string name="text_online_player">Player</string>
     <string name="text_server_address">Server Address</string>
     <string name="action_edit_server">Edit</string>
+    <string name="message_edit_server">Edit address and/or port</string>
+    <string name="action_about">About</string>
+    <string name="about_author">Author:</string>
+    <string name="about_text">Monitor L4D2 dedicated servers from your Android Phone!</string>
+    <string name="about_text2">This is my first Android App</string>
+    <string name="about_text3">Click the image to check out my Github page!</string>
+    <string name="about_date">14th Feb. 2018</string>
 </resources>

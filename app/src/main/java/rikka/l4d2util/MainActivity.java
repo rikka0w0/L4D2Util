@@ -92,6 +92,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+    public void onShowAboutClick(MenuItem item) {
+        startActivity(new Intent(this, AboutActivity.class));
+    }
+
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
         final ServerObject server = (ServerObject ) parent.getAdapter().getItem(position);
@@ -113,8 +117,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     case R.id.action_edit_server:
                         InputBox.show(
                                 MainActivity.this,
-                                getString(R.string.message_add_server),
-                                getString(R.string.action_add_server),
+                                getString(R.string.message_edit_server),
+                                getString(R.string.action_edit_server),
                                 server.hostname+":"+String.valueOf(server.port),
                                 new InputBox.IInputBoxHandler() {
                                     @Override
@@ -146,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         intent.putExtra("port", server.port);
         startActivity(intent);
     }
-
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     private static class RefreshServerInfoAsyncTask extends AsyncTask<Object, Object, L4D2Server.Info> {

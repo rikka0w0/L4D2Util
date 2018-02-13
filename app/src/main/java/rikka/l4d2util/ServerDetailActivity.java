@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import rikka.l4d2util.common.L4D2Server;
@@ -18,13 +20,24 @@ public class ServerDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_detail);
-        textView = (TextView) findViewById(R.id.text_server_detail) ;
+        textView = (TextView) findViewById(R.id.text_server_detail);
 
         Intent intent = getIntent();
         this.hostname = intent.getStringExtra("hostname");
         this.port = intent.getIntExtra("port", 27015);
 
         setTitle(hostname);
+        refreshDetail();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_server_detail, menu);
+        return true;
+    }
+
+    public void onRefreshClick(MenuItem item) {
         refreshDetail();
     }
 

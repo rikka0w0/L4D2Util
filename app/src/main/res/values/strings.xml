@@ -6,5 +6,10 @@
     <string name="action_refresh_server">Refresh</string>
     <string name="toast_refreshing">Refreshing</string>
     <string name="subtext_unable_to_contact_server">Unable to contact server</string>
-    <string name="subtext_querying">Querying...</string>
+    <string name="subtext_querying">Querying…</string>
+    <string name="text_server_name">Server Name</string>
+    <string name="text_map_name">Map Name</string>
+    <string name="text_online_player">Player</string>
+    <string name="text_server_address">Server Address</string>
+    <string name="action_edit_server">Edit</string>
 </resources>

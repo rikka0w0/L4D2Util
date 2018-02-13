@@ -12,7 +12,7 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:paddingTop="8dp"
-        android:singleLine="true"
+        android:singleLine="false"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:singleLine="true"
+        android:singleLine="false"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="14sp"
         android:textStyle="normal" />

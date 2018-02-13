@@ -27,34 +27,11 @@ public class ServerList {
         this.list = new ArrayList<>();
     }
 
-    public void add(String url) {
-        int pos = url.indexOf(':');
-        if (pos >= 0) {
-            String hostname = url.substring(0, pos);
-            String portString = url.substring(pos + 1);
-            int port;
-            try {
-                port = Integer.parseInt(portString);
-            } catch (Exception e) {
-                port = 27015;
-            }
-            add(hostname, port);
-        } else {
-            add(url, 27015);
-        }
-    }
-
-    public void add(String hostname, int port) {
-        addImpl(hostname, port);
-        syncView();
-    }
-
-    private void addImpl(String hostname, int port) {
-        ServerObject serverObject = new ServerObject();
-        serverObject.hostname = hostname;
-        serverObject.port = port;
-        serverObject.text = hostname + ":" + String.valueOf(port);
+    public ServerObject add(String url) {
+        ServerObject serverObject = new ServerObject(url);
         list.add(serverObject);
+        syncView();
+        return serverObject;
     }
 
     public ServerObject remove(int index) {
@@ -65,6 +42,13 @@ public class ServerList {
 
     public boolean remove(ServerObject object) {
         boolean ret = list.remove(object);
+        syncView();
+        return ret;
+    }
+
+    public ServerObject replace(int index, String url) {
+        ServerObject ret = new ServerObject(url);
+        list.set(index, ret);
         syncView();
         return ret;
     }
@@ -95,7 +79,7 @@ public class ServerList {
                 JSONObject serverConfig = serverArray.getJSONObject(i);
                 String hostname = serverConfig.getString("hostname");
                 int port = serverConfig.getInt("port");
-                addImpl(hostname, port);
+                list.add(new ServerObject(hostname, port));
             }
 
             syncView();

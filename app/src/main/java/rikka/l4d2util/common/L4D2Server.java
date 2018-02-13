@@ -51,7 +51,7 @@ public class L4D2Server {
             int recvBufLength = response.getLength();
             byte[] recvBuf = response.getData();
             // Check magic number and header
-            if ((recvBuf[0] & 0xff) != 0xff ||
+            if (    (recvBuf[0] & 0xff) != 0xff ||
                     (recvBuf[1] & 0xff) != 0xff ||
                     (recvBuf[2] & 0xff) != 0xff ||
                     (recvBuf[3] & 0xff) != 0xff ||
@@ -94,36 +94,59 @@ public class L4D2Server {
         }
     }
 
-    public static void GetPlayerList(String hostname, int port) {
+    public static String[] GetPlayerList(String hostname, int port) {
         try {
+            InetAddress hostAddr = InetAddress.getByName(hostname);
             DatagramSocket socket = new DatagramSocket(0);
             socket.setSoTimeout(10000);
-            InetAddress hostAddr = InetAddress.getByName(hostname);
 
-            byte[] req = { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x54, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-                    0x20, 0x45, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x20, 0x51, 0x75, 0x65, 0x72, 0x79, 0x00 };
-
-            byte[] req2 = {(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x55, 0x00, 0x00, 0x00, 0x00};
-
-            DatagramPacket request = new DatagramPacket(req2, req2.length, hostAddr, port);
-            DatagramPacket response = new DatagramPacket(new byte[1024], 1024);
+            DatagramPacket request = new DatagramPacket(requestGetPlayerList, requestGetPlayerList.length, hostAddr, port);
+            DatagramPacket response = new DatagramPacket(new byte[512], 512);
             socket.send(request);
             socket.receive(response);
 
-            byte[] rep = {(byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x55, 0x00, 0x00, 0x00, 0x00};
-            rep[5] = response.getData()[5];
-            rep[6] = response.getData()[6];
-            rep[7] = response.getData()[7];
-            rep[8] = response.getData()[8];
-            request = new DatagramPacket(rep, rep.length, hostAddr, port);
+            byte[] recvBuf = response.getData();
+            // Check magic number and header
+            if (    (recvBuf[0] & 0xff) != 0xff ||
+                    (recvBuf[1] & 0xff) != 0xff ||
+                    (recvBuf[2] & 0xff) != 0xff ||
+                    (recvBuf[3] & 0xff) != 0xff ||
+                    (recvBuf[4] & 0xff) != 0x41) {
+                // Invalid responce from server
+                return null;
+            }
+
+            // Reform request packet
+            recvBuf[4] = requestGetPlayerList[4];
+            request = new DatagramPacket(recvBuf, recvBuf.length, hostAddr, port);
             socket.send(request);
             socket.receive(response);
 
+            int recvBufLength = response.getLength();
+            recvBuf = response.getData();
+            // Check magic number and header
+            if (    (recvBuf[0] & 0xff) != 0xff ||
+                    (recvBuf[1] & 0xff) != 0xff ||
+                    (recvBuf[2] & 0xff) != 0xff ||
+                    (recvBuf[3] & 0xff) != 0xff ||
+                    (recvBuf[4] & 0xff) != 0x44) {
+                // Invalid responce from server
+                return null;
+            }
 
-            String result = new String(response.getData(), 0, response.getLength(), "ASCII");
-            System.out.println(result);
+            int playerCount = recvBuf[5];
+            String[] players = new String[playerCount];
+
+            int segmentStart = 7;
+            for (int i=0; i<playerCount; i++) {
+                int segmentLength = getSegmentLength(recvBuf, segmentStart, recvBufLength);
+                players[i] = new String(recvBuf, segmentStart, segmentLength, "UTF-8");
+                segmentStart += segmentLength + 10;
+            }
+
+            return players;
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
     }
 }

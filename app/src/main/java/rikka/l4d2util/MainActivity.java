@@ -1,11 +1,9 @@
 package rikka.l4d2util;
 
-import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -14,17 +12,13 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.Toast;
-
-
-import java.util.ArrayList;
 
 import rikka.android.InputBox;
 import rikka.l4d2util.common.L4D2Server;
 import rikka.l4d2util.common.ServerList;
 import rikka.l4d2util.common.ServerObject;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener{
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
     protected ServerList serverList;
     protected ServerListAdapter serverListAapter;
 
@@ -48,16 +42,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         serverListAapter = new ServerListAdapter(this, serverList.getList());
         ListView listviewServerList = (ListView) findViewById(R.id.serverlist);
         listviewServerList.setAdapter(serverListAapter);
+        listviewServerList.setOnItemClickListener(this);
         listviewServerList.setOnItemLongClickListener(this);
 
+        // Refresh immediately
+        RefreshAllAsync();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (ServerObject server: serverList.getList()) {
-                    RefreshServerInfoAsync(server);
-                }
+                RefreshAllAsync();
             }
         });
     }
@@ -89,53 +84,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClose(String text) {
                 if (text != null) {
-                    serverList.add(text);
+                    ServerObject server = serverList.add(text);
                     serverList.save();
+                    RefreshServerInfoAsync(server);
                 }
             }
         });
     }
 
-    public void RefreshServerInfoAsync(final ServerObject... serverObjects) {
-        for (ServerObject server: serverObjects) {
-            server.subText = getString(R.string.subtext_querying);
-        }
-        serverList.syncView();
-
-        (new AsyncTask<Object, Integer, ArrayList<L4D2Server.Info>>() {
-            @Override
-            protected ArrayList<L4D2Server.Info> doInBackground(Object... useless) {
-                ArrayList<L4D2Server.Info> results = new ArrayList<>(serverObjects.length);
-                for (int i=0; i<serverObjects.length; i++) {
-                    ServerObject server = serverObjects[i];
-                    results.add(i, L4D2Server.QueryServerInfo(server.hostname, server.port));
-                }
-
-                return results;
-            }
-
-            @Override
-            protected void onPostExecute(ArrayList<L4D2Server.Info> result) {
-                for (int i=0; i<serverObjects.length; i++) {
-                    ServerObject server = serverObjects[i];
-                    L4D2Server.Info info = result.get(i);
-
-                    if (info == null) {
-                        server.subText = getString(R.string.subtext_unable_to_contact_server);
-                    } else {
-                        server.subText =
-                                "(" + String.valueOf(info.playerCount) + "/" +
-                                        String.valueOf(info.slotCount) + ") " + info.mapName;
-                    }
-                }
-
-                serverList.syncView();
-            }
-        }).execute(serverObjects);
-    }
-
     @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
         final ServerObject server = (ServerObject ) parent.getAdapter().getItem(position);
 
         PopupMenu popup = new PopupMenu(MainActivity.this, view);
@@ -152,6 +110,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     case R.id.action_refresh_server:
                         RefreshServerInfoAsync(server);
                         break;
+                    case R.id.action_edit_server:
+                        InputBox.show(
+                                MainActivity.this,
+                                getString(R.string.message_add_server),
+                                getString(R.string.action_add_server),
+                                server.hostname+":"+String.valueOf(server.port),
+                                new InputBox.IInputBoxHandler() {
+                                    @Override
+                                    public void onClose(String text) {
+                                        if (text != null) {
+                                            ServerObject newServer = serverList.replace(position, text);
+                                            serverList.save();
+                                            RefreshServerInfoAsync(newServer);
+                                        }
+                                    }
+                        });
+                        break;
                 }
                 return false;
             }
@@ -159,7 +134,60 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         popup.show();
 
-
         return true;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final ServerObject server = (ServerObject ) parent.getAdapter().getItem(position);
+
+        Intent intent = new Intent(this, ServerDetailActivity.class);
+        intent.putExtra("hostname", server.hostname);
+        intent.putExtra("port", server.port);
+        startActivity(intent);
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    private static class RefreshServerInfoAsyncTask extends AsyncTask<Object, Object, L4D2Server.Info> {
+        private final MainActivity context;
+        private final ServerObject server;
+
+        public RefreshServerInfoAsyncTask(MainActivity context, ServerObject server) {
+            this.context = context;
+            this.server = server;
+        }
+
+        @Override
+        protected L4D2Server.Info doInBackground(Object... useless) {
+            return L4D2Server.QueryServerInfo(server.hostname, server.port);
+        }
+
+        @Override
+        protected void onPostExecute(L4D2Server.Info info) {
+            if (info == null) {
+                server.subText = context.getString(R.string.subtext_unable_to_contact_server);
+                server.contacted = false;
+            } else {
+                server.subText =
+                        " (" + String.valueOf(info.playerCount) + "/" +
+                        String.valueOf(info.slotCount) + ") " + info.serverName +"\n" + info.mapName;
+                server.contacted = true;
+            }
+
+            context.serverList.syncView();
+        }
+    }
+
+    public void RefreshServerInfoAsync(ServerObject server) {
+        server.subText = getString(R.string.subtext_querying);
+        serverList.syncView();
+        (new RefreshServerInfoAsyncTask(this, server)).execute();
+    }
+
+    public void RefreshAllAsync() {
+        for (ServerObject server: serverList.getList()) {
+            RefreshServerInfoAsync(server);
+        }
     }
 }

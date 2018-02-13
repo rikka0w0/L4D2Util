@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import rikka.l4d2util.R;
 import rikka.l4d2util.common.ServerObject;
 
 /**

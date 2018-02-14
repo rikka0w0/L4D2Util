@@ -81,10 +81,15 @@ public class ServerDetailActivity extends AppCompatActivity {
                         context.getString(R.string.text_online_player) + " (" +
                         String.valueOf(info.playerCount) + "/" + String.valueOf(info.slotCount) + ") :";
 
-                String[] players = (String[]) results[1];
-                for (int i=0; i<players.length; i++) {
-                    text += "\n" + String.valueOf(i+1) + "." + players[i];
+                if (results[1] == null) {
+                    text += "\n" + context.getString(R.string.subtext_unable_to_retrieve_player_list);
+                } else {
+                    String[] players = (String[]) results[1];
+                    for (int i=0; i<players.length; i++) {
+                        text += "\n" + String.valueOf(i+1) + "." + players[i];
+                    }
                 }
+
                 context.textView.setText(text);
             }
         }

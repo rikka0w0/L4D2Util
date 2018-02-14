@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">L4D2Util</string>
+    <string name="action_add_server">添加服务器</string>
+    <string name="message_add_server">请输入服务器地址和端口,例如sample.com:port. 如果省略端口则默认27015.</string>
+    <string name="action_delete_server">删除</string>
+    <string name="action_refresh_server">刷新</string>
+    <string name="toast_refreshing">正在刷新</string>
+    <string name="subtext_unable_to_contact_server">无法与服务器取得联系</string>
+    <string name="subtext_querying">正在查询…</string>
+    <string name="subtext_unable_to_retrieve_player_list">无法取得玩家列表</string>
+    <string name="text_server_name">服务器名</string>
+    <string name="text_map_name">地图</string>
+    <string name="text_online_player">在线玩家</string>
+    <string name="text_server_address">服务器地址</string>
+    <string name="action_edit_server">编辑</string>
+    <string name="message_edit_server">编辑地址和端口</string>
+    <string name="action_about">关于</string>
+    <string name="about_author">作者:</string>
+    <string name="about_text">在Android手机上监视求生之路2服务器!</string>
+    <string name="about_text2">这是老娘第一个Android应用哦</string>
+    <string name="about_text3">点图片就可以跳转到窝的Github主页辣!</string>
+    <string name="about_date">2018年2月14日</string>
+</resources>

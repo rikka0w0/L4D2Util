@@ -8,11 +8,19 @@
         android:orderInCategory="100"
         android:title="@string/action_refresh_server" />
     <item
-        android:id="@+id/action_edit_server"
+        android:id="@+id/action_rcon"
         android:orderInCategory="101"
+        android:title="@string/action_rcon" />
+    <item
+        android:id="@+id/action_edit_rcon_password"
+        android:orderInCategory="102"
+        android:title="@string/action_edit_rcon_password" />
+    <item
+        android:id="@+id/action_edit_server"
+        android:orderInCategory="103"
         android:title="@string/action_edit_server" />
     <item
         android:id="@+id/action_delete_server"
-        android:orderInCategory="102"
+        android:orderInCategory="104"
         android:title="@string/action_delete_server" />
-</menu>
+    </menu>

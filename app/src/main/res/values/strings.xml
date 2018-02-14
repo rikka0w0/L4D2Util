@@ -20,4 +20,14 @@
     <string name="about_text2">This is my first Android App</string>
     <string name="about_text3">Click the image to check out my Github page!</string>
     <string name="about_date">14th Feb. 2018</string>
+    <string name="action_rcon">RCON</string>
+    <string name="btn_send_text">Send</string>
+    <string name="rcon_status_authorizing">Authorizing…</string>
+    <string name="rcon_status_authorize_failed">Failed.</string>
+    <string name="rcon_status_authorize_succeeded">Ready for commands.</string>
+    <string name="rcon_status_command_failed">Command failed.</string>
+    <string name="rcon_password">RCON password</string>
+    <string name="rcon_password_hint">The value of cvar \"rcon_password\" on server</string>
+    <string name="action_clear_log">Clear log</string>
+    <string name="action_edit_rcon_password">Edit RCON password</string>
 </resources>

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,7 +81,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void onAddServerClick(MenuItem item) {
-        InputBox.show(this, getString(R.string.message_add_server), getString(R.string.action_add_server), "", new InputBox.IInputBoxHandler() {
+        InputBox.show(this, getString(R.string.message_add_server),
+                getString(R.string.action_add_server), "",
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                new InputBox.IInputBoxHandler() {
             @Override
             public void onClose(String text) {
                 if (text != null) {
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 getString(R.string.message_edit_server),
                                 getString(R.string.action_edit_server),
                                 server.hostname+":"+String.valueOf(server.port),
+                                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
                                 new InputBox.IInputBoxHandler() {
                                     @Override
                                     public void onClose(String text) {
@@ -130,6 +135,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                         }
                                     }
                         });
+                        break;
+                    case R.id.action_rcon:
+                        if (server.password.trim().length() > 0) {
+                            startRcon(server);
+                        } else {
+                            showEditRconPasswordBox(server, false);
+                        }
+
+                        break;
+                    case R.id.action_edit_rcon_password:
+                        showEditRconPasswordBox(server, true);
+
                         break;
                 }
                 return false;
@@ -192,5 +209,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         for (ServerObject server: serverList.getList()) {
             RefreshServerInfoAsync(server);
         }
+    }
+
+    public void startRcon(ServerObject server) {
+        Intent intent = new Intent(this, RconActivity.class);
+        intent.putExtra("hostname", server.hostname);
+        intent.putExtra("port", server.port);
+        intent.putExtra("password", server.password);
+        this.startActivity(intent);
+    }
+
+    private void showEditRconPasswordBox(final ServerObject server, final boolean editOnly) {
+        InputBox.show(MainActivity.this,
+                getString(R.string.rcon_password_hint),
+                getString(R.string.rcon_password),
+                server.password,
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                new InputBox.IInputBoxHandler() {
+                    @Override
+                    public void onClose(String text) {
+                        if (editOnly) {
+                            if (text != null){
+                                server.password = text;
+                                MainActivity.this.serverList.save();
+                            }
+                        } else {
+                            if (text != null && text.trim().length() > 0) {
+                                server.password = text;
+                                MainActivity.this.serverList.save();
+                                startRcon(server);
+                            }
+                        }
+                    }
+                });
     }
 }

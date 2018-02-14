@@ -12,6 +12,10 @@ import android.widget.EditText;
 
 public class InputBox {
     public static void show(Context context, String message, String title, String defaultText, final IInputBoxHandler eventHandler) {
+        show(context, message, title, defaultText, InputType.TYPE_CLASS_TEXT, eventHandler);
+    }
+
+    public static void show(Context context, String message, String title, String defaultText, int inputType, final IInputBoxHandler eventHandler) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(message);
@@ -19,7 +23,7 @@ public class InputBox {
         // Set up the input
         final EditText input = new EditText(context);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setInputType(inputType);
         input.setText(defaultText);
         builder.setView(input);
 
@@ -42,10 +46,10 @@ public class InputBox {
         builder.show();
     }
 
-    public static interface IInputBoxHandler {
+    public interface IInputBoxHandler {
         /**
          * @param text null if cancelled
          */
-        public void onClose(String text);
+        void onClose(String text);
     }
 }

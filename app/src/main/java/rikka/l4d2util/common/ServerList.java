@@ -79,7 +79,13 @@ public class ServerList {
                 JSONObject serverConfig = serverArray.getJSONObject(i);
                 String hostname = serverConfig.getString("hostname");
                 int port = serverConfig.getInt("port");
-                list.add(new ServerObject(hostname, port));
+                String password = "";
+                if (serverConfig.has("password")) {
+                    password = serverConfig.getString("password");
+                }
+                ServerObject server = new ServerObject(hostname, port);
+                server.password = password;
+                list.add(server);
             }
 
             syncView();
@@ -101,6 +107,7 @@ public class ServerList {
                 JSONObject serverConfig = new JSONObject();
                 serverConfig.put("hostname", serverObject.hostname);
                 serverConfig.put("port", serverObject.port);
+                serverConfig.putOpt("password", serverObject.password);
                 serverArray.put(serverConfig);
             }
             root.put("servers", serverArray);

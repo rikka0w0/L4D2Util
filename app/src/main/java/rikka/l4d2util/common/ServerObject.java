@@ -8,6 +8,7 @@ public class ServerObject{
     // Saved data
     public final String hostname;
     public final int port;
+    public String password = "";
 
     // Sensed data
     public boolean contacted = false;

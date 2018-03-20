@@ -1,15 +1,15 @@
 package rikka.l4d2util;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -20,14 +20,16 @@ import rikka.l4d2util.common.ServerList;
 import rikka.l4d2util.common.ServerObject;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
+    protected Handler uiUpdateHandler;
     protected ServerList serverList;
     protected ServerListAdapter serverListAapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        uiUpdateHandler = new Handler();
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         serverList.load();
 
         serverListAapter = new ServerListAdapter(this, serverList.getList());
-        ListView listviewServerList = (ListView) findViewById(R.id.serverlist);
+        ListView listviewServerList = findViewById(R.id.serverlist);
         listviewServerList.setAdapter(serverListAapter);
         listviewServerList.setOnItemClickListener(this);
         listviewServerList.setOnItemLongClickListener(this);
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Refresh immediately
         RefreshAllAsync();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -169,40 +171,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    private static class RefreshServerInfoAsyncTask extends AsyncTask<Object, Object, L4D2Server.Info> {
+    private static class RefreshServerInfoThread extends Thread {
         private final MainActivity context;
         private final ServerObject server;
 
-        public RefreshServerInfoAsyncTask(MainActivity context, ServerObject server) {
+        private RefreshServerInfoThread(MainActivity context, ServerObject server) {
             this.context = context;
             this.server = server;
         }
 
         @Override
-        protected L4D2Server.Info doInBackground(Object... useless) {
-            return L4D2Server.QueryServerInfo(server.hostname, server.port);
-        }
-
-        @Override
-        protected void onPostExecute(L4D2Server.Info info) {
-            if (info == null) {
-                server.subText = context.getString(R.string.subtext_unable_to_contact_server);
-                server.contacted = false;
-            } else {
-                server.subText =
-                        " (" + String.valueOf(info.playerCount) + "/" +
-                        String.valueOf(info.slotCount) + ") " + info.serverName +"\n" + info.mapName;
-                server.contacted = true;
-            }
-
-            context.serverList.syncView();
+        public void run() {
+            final L4D2Server.Info info = L4D2Server.QueryServerInfo(server.hostname, server.port);
+            context.uiUpdateHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (info == null) {
+                        server.subText = context.getString(R.string.subtext_unable_to_contact_server);
+                        server.contacted = false;
+                    } else {
+                        server.subText =
+                                " (" + String.valueOf(info.playerCount) + "/" +
+                                        String.valueOf(info.slotCount) + ") " + info.serverName +"\n" + info.mapName;
+                        server.contacted = true;
+                    }
+                    context.serverList.syncView();
+                }
+            });
         }
     }
 
     public void RefreshServerInfoAsync(ServerObject server) {
         server.subText = getString(R.string.subtext_querying);
         serverList.syncView();
-        (new RefreshServerInfoAsyncTask(this, server)).execute();
+        (new RefreshServerInfoThread(this, server)).start();
     }
 
     public void RefreshAllAsync() {

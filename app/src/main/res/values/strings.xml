@@ -19,7 +19,7 @@
     <string name="about_text">Monitor L4D2 dedicated servers from your Android Phone!</string>
     <string name="about_text2">This is my first Android App</string>
     <string name="about_text3">Click the image to check out my Github page!</string>
-    <string name="about_date">14th Feb. 2018</string>
+    <string name="about_date">March 20, 2018</string>
     <string name="action_rcon">RCON</string>
     <string name="btn_send_text">Send</string>
     <string name="rcon_status_authorizing">Authorizing…</string>

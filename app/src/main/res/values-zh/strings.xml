@@ -19,7 +19,7 @@
     <string name="about_text">在Android手机上监视求生之路2服务器!</string>
     <string name="about_text2">这是老娘第一个Android应用哦</string>
     <string name="about_text3">点图片就可以跳转到窝的Github主页辣!</string>
-    <string name="about_date">2018年2月14日</string>
+    <string name="about_date">2018年3月20日</string>
     <string name="action_rcon">RCON(远程控制)</string>
     <string name="btn_send_text">发送</string>
     <string name="rcon_status_authorizing">正在获得授权…</string>

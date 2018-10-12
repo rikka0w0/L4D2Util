@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">L4D2Util</string>
+    <string name="app_name">SrcDSUtil</string>
     <string name="action_add_server">添加服务器</string>
     <string name="message_add_server">请输入服务器地址和端口,例如sample.com:port. 如果省略端口则默认27015.</string>
     <string name="action_delete_server">删除</string>

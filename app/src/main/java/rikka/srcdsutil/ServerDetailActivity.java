@@ -72,11 +72,14 @@ public class ServerDetailActivity extends AppCompatActivity {
             L4D2Server.Info info = (L4D2Server.Info) results[0];
             if (info == null) {
                 context.textView.setText(R.string.subtext_unable_to_contact_server);
+            } else if (info.version == L4D2Server.SrcDsVersion.UNKNOWN) {
+                context.textView.setText(R.string.subtext_unrecognized_server);
             } else {
                 context.setTitle(info.serverName);
                 String text =
                         context.getString(R.string.text_server_address) + ": \n" + hostname + ":" + String.valueOf(port) + "\n" +
                         context.getString(R.string.text_server_name) + ": \n" + info.serverName + "\n" +
+                        context.getString(info.getGameVersionLocateIndex()) + "\n" +
                         context.getString(R.string.text_map_name) + ": \n" + info.mapName + "\n" +
                         context.getString(R.string.text_online_player) + " (" +
                         String.valueOf(info.playerCount) + "/" + String.valueOf(info.slotCount) + ") :";

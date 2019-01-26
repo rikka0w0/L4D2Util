@@ -6,6 +6,7 @@
     <string name="action_refresh_server">Refresh</string>
     <string name="toast_refreshing">Refreshing</string>
     <string name="subtext_unable_to_contact_server">Unable to contact server</string>
+    <string name="subtext_unrecognized_server">Unrecognized Server</string>
     <string name="subtext_querying">Querying…</string>
     <string name="subtext_unable_to_retrieve_player_list">Unable to retrieve player list</string>
     <string name="text_server_name">Server Name</string>
@@ -30,4 +31,7 @@
     <string name="rcon_password_hint">The value of cvar \"rcon_password\" on server</string>
     <string name="action_clear_log">Clear log</string>
     <string name="action_edit_rcon_password">Edit RCON password</string>
+    <string name="game_unknown">Unknown</string>
+    <string name="game_l4d2">Left 4 Dead 2</string>
+    <string name="game_cs16">Counter Strike 1.6</string>
 </resources>

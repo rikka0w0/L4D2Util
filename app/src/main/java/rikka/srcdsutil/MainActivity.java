@@ -189,6 +189,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (info == null) {
                         server.subText = context.getString(R.string.subtext_unable_to_contact_server);
                         server.contacted = false;
+                    } else if (info.version == L4D2Server.SrcDsVersion.UNKNOWN) {
+                        server.subText = context.getString(R.string.subtext_unrecognized_server);
+                        server.contacted = false;
                     } else {
                         server.subText =
                                 " (" + String.valueOf(info.playerCount) + "/" +

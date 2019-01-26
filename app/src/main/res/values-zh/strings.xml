@@ -6,6 +6,7 @@
     <string name="action_refresh_server">刷新</string>
     <string name="toast_refreshing">正在刷新</string>
     <string name="subtext_unable_to_contact_server">无法与服务器取得联系</string>
+    <string name="subtext_unrecognized_server">无法识别的服务器</string>
     <string name="subtext_querying">正在查询…</string>
     <string name="subtext_unable_to_retrieve_player_list">无法取得玩家列表</string>
     <string name="text_server_name">服务器名</string>
@@ -30,4 +31,7 @@
     <string name="rcon_password_hint">服务器上\"rcon_password\"这个cvar的值</string>
     <string name="action_clear_log">清空日志</string>
     <string name="action_edit_rcon_password">修改RCON密码</string>
+    <string name="game_unknown">未知版本</string>
+    <string name="game_l4d2">求生之路2</string>
+    <string name="game_cs16">反恐精英1.6</string>
 </resources>

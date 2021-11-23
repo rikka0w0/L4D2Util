@@ -1,10 +1,12 @@
 package rikka.srcdsutil.common;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import android.util.Log;
 import rikka.srcdsutil.R;
 
 /**
@@ -12,11 +14,7 @@ import rikka.srcdsutil.R;
  */
 
 public class L4D2Server {
-    private final static byte[] requestQueryServerInfo = {
-            (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x54, 0x53, 0x6f, 0x75,
-            0x72, 0x63, 0x65, 0x20, 0x45, 0x6e, 0x67, 0x69,
-            0x6e, 0x65, 0x20, 0x51, 0x75, 0x65, 0x72, 0x79,
-            0x00 };
+    private final static byte[] requestQueryServerInfo =hexStrToBinaryStr("FF FF FF FF 54 53 6F 75 72 63 65 20 45 6E 67 69 6E 65 20 51 75 65 72 79 00");
 
     private final static byte[] requestGetPlayerList = {
             (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x55, 0x00, 0x00, 0x00,
@@ -61,12 +59,14 @@ public class L4D2Server {
     }
 
     private static Info parse_l4d2_responce(byte[] recvBuf, int recvBufLength) throws UnsupportedEncodingException {
+        Log.d("a2s", "准备处理:"+hexTohexStr(recvBuf));
         Info info = new Info();
         info.version = SrcDsVersion.L4D2;
 
         int segmentStart = 6;
         int segmentLength = getSegmentLength(recvBuf, segmentStart, recvBufLength);
         info.serverName = new String(recvBuf, segmentStart, segmentLength, "UTF-8");
+        Log.d("a2s", "准备处理:"+info.serverName);
         segmentStart += segmentLength + 1;
 
         segmentLength = getSegmentLength(recvBuf, segmentStart, recvBufLength);
@@ -80,11 +80,6 @@ public class L4D2Server {
         segmentLength = getSegmentLength(recvBuf, segmentStart, recvBufLength);
         info.gameType = new String(recvBuf, segmentStart, segmentLength, "UTF-8");
         segmentStart += segmentLength + 1;
-
-        if (recvBuf[segmentStart] != 0x26 || recvBuf[segmentStart + 1] != 0x02) {
-            // Invalid responce from server\n
-            return null;
-        }
 
         info.playerCount = recvBuf[segmentStart+2];
         info.slotCount = recvBuf[segmentStart+3];
@@ -121,20 +116,78 @@ public class L4D2Server {
 
         return info;
     }
-
-    public static Info QueryServerInfo(String hostname, int port) {
+    public static final void arraycopy(byte[] src,int srcPos,byte[] dest,int destPos,int length)
+    {
+        for(int i=0;i<length;i++)
+        {
+            dest[destPos+i]=src[srcPos+i];
+        }
+    }
+    public static final String hexTohexStr(byte[] data){
         try {
-            InetAddress hostAddr = InetAddress.getByName(hostname);
-            DatagramSocket socket = new DatagramSocket(0);
+            char[] HEX_CHAR = {'0', '1', '2', '3', '4', '5','6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+            StringBuffer stringBuffer=new StringBuffer();
+            for(int i=0;i<data.length;i++)
+            {
+                stringBuffer.append(HEX_CHAR[(data[i]<0?data[i]+256:data[i])/16]);
+                stringBuffer.append(HEX_CHAR[(data[i]<0?data[i]+256:data[i])%16]);
+                stringBuffer.append(" ");
+            }
+            return stringBuffer.toString();
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static final byte[] hexStrToBinaryStr(String hexString) {
+        if(hexString==null) return null;
+        String[] tmp = hexString.split(" ");
+        byte[] tmpBytes = new byte[tmp.length];
+        int i = 0;
+        for (String b : tmp) {
+            if (b.equals("FF")) {
+                tmpBytes[i++] = -1;
+            } else {
+                tmpBytes[i++] = Integer.valueOf(b, 16).byteValue();
+            }
+        }
+        return tmpBytes;
+    }
+    public static final byte[] SendData(DatagramSocket socket,String ip, int port, byte[] data) throws IOException {
+        Log.d("a2s", "准备发送:"+hexTohexStr(data));
+        InetAddress address = InetAddress.getByName(ip);
+        DatagramPacket datagramPacket=new DatagramPacket(data,data.length,address,port);
+        socket.setSoTimeout(500);
+        socket.send(datagramPacket);
+        //构建一个数据接收对象
+        byte[] receBuf = new byte[4096];
+        DatagramPacket recePacket = new DatagramPacket(receBuf, receBuf.length);
+        socket.receive(recePacket);
+        Integer length=recePacket.getLength();
+        byte[] resBytes=recePacket.getData();
+        byte[] f=new byte[length];
+        arraycopy(resBytes,0,f,0,length);
+
+        Log.d("a2s", "接收的数据"+hexTohexStr(f));
+        return f;
+    }
+    public static Info QueryServerInfo(String hostname, int port) {
+        DatagramSocket socket = null;
+        try {
+            socket = new DatagramSocket(0);
             socket.setSoTimeout(5000);
 
-            DatagramPacket request = new DatagramPacket(requestQueryServerInfo, requestQueryServerInfo.length, hostAddr, port);
-            DatagramPacket response = new DatagramPacket(new byte[512], 512);
-            socket.send(request);
-            socket.receive(response);
+            byte[] recvBuf =SendData(socket, hostname, port,requestQueryServerInfo);
 
-            int recvBufLength = response.getLength();
-            byte[] recvBuf = response.getData();
+            if(recvBuf[4]==(byte) 0x41)
+            {
+                byte[] newPacket=new byte[requestQueryServerInfo.length+4];
+                arraycopy(requestQueryServerInfo,0,newPacket,0,requestQueryServerInfo.length);
+
+                arraycopy(recvBuf,5,newPacket,requestQueryServerInfo.length,4);
+                recvBuf =SendData(socket, hostname, port,newPacket);
+            }
             // Check magic number and header
             if ((recvBuf[0] & 0xff) == 0xff &&
                     (recvBuf[1] & 0xff) == 0xff &&
@@ -144,9 +197,9 @@ public class L4D2Server {
                 if (
                         (recvBuf[4] & 0xff) == 0x49 &&
                                 (recvBuf[5] & 0xff) == 0x11) {
-                    return parse_l4d2_responce(recvBuf, recvBufLength);
+                    return parse_l4d2_responce(recvBuf, recvBuf.length);
                 } else if ((recvBuf[4] & 0xff) == 0x6D) {
-                    return parse_cs16_responce(recvBuf, recvBufLength);
+                    return parse_cs16_responce(recvBuf, recvBuf.length);
                 }
 
                 return new Info();
@@ -154,7 +207,12 @@ public class L4D2Server {
 
             return null;
         } catch (Exception e) {
+            Log.e("a2s", "连接失败"+e.getMessage());
             return null;
+        }finally {
+            if(socket!=null){
+                socket.close();
+            }
         }
     }
 

@@ -5,7 +5,7 @@
     <string name="action_delete_server">Remove</string>
     <string name="action_refresh_server">Refresh</string>
     <string name="toast_refreshing">Refreshing</string>
-    <string name="subtext_unable_to_contact_server">Unable to contact server</string>
+    <string name="subtext_unable_to_contact_server">Unable to contact server!</string>
     <string name="subtext_unrecognized_server">Unrecognized Server</string>
     <string name="subtext_querying">Querying…</string>
     <string name="subtext_unable_to_retrieve_player_list">Unable to retrieve player list</string>

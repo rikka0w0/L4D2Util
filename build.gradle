@@ -3,6 +3,9 @@
 buildscript {
     
     repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/central'
+        }
         google()
         jcenter()
     }

@@ -79,7 +79,7 @@ public class ServerDetailActivity extends AppCompatActivity {
                 String text =
                         context.getString(R.string.text_server_address) + ": \n" + hostname + ":" + String.valueOf(port) + "\n" +
                         context.getString(R.string.text_server_name) + ": \n" + info.serverName + "\n" +
-                        context.getString(info.getGameVersionLocateIndex()) + "\n" +
+                        info.directory + "\n" +
                         context.getString(R.string.text_map_name) + ": \n" + info.mapName + "\n" +
                         context.getString(R.string.text_online_player) + " (" +
                         String.valueOf(info.playerCount) + "/" + String.valueOf(info.slotCount) + ") :";
